@@ -51,27 +51,43 @@ class PagesController extends Controller
 
     // Show products page
     public function productsPage(Request $request)
-{
-    // Ensure a customer is selected
-    if (!$request->session()->has('selected_customer')) {
-        return redirect()->route('select.customer')->withErrors(['error' => 'Please select a customer first.']);
+    {
+        // Ensure a customer is selected
+        if (!$request->session()->has('selected_customer')) {
+            return redirect()->route('select.customer')->withErrors(['error' => 'Please select a customer first.']);
+        }
+
+        $selectedCustomer = $request->session()->get('selected_customer');
+
+        // Fetch all categories
+        $categories = Category::all();
+
+        // Fetch products with their category based on the selected category or all products if none selected
+        $selectedCategoryId = $request->query('category_id');
+        if ($selectedCategoryId) {
+            $products = Product::where('category_id', $selectedCategoryId)
+                ->with('category') // Include the related category
+                ->get();
+        } else {
+            $products = Product::with('category')->get();
+        }
+
+        // Map products to include category_name
+        $products = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'price' => $product->price,
+                'image' => $product->image,
+                'category_name' => $product->category->name ?? 'Uncategorized', // Default if no category
+                'category_id' => $product->category->id,
+            ];
+        });
+
+        return view('front.products', compact('selectedCustomer', 'categories', 'products', 'selectedCategoryId'));
     }
 
-    $selectedCustomer = $request->session()->get('selected_customer');
-
-    // Fetch all categories
-    $categories = Category::all();
-
-    // Fetch products based on selected category or all products if none selected
-    $selectedCategoryId = $request->query('category_id');
-    if ($selectedCategoryId) {
-        $products = Product::where('category_id', $selectedCategoryId)->get();
-    } else {
-        $products = Product::all();
-    }
-
-    return view('front.products', compact('selectedCustomer', 'categories', 'products', 'selectedCategoryId'));
-}
 
 
     public function resetCustomer(Request $request)
