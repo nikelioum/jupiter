@@ -10,4 +10,10 @@ class PagesController extends Controller
     public function index(){
         return view ('front.index');
     }
+
+    //Promoter Dashboard
+    public function promoter_dashboard(){
+
+        return view('front.dashboard');
+    }
 }
