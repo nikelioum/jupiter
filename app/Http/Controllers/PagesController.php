@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Category;
+use App\Models\Product;
 
 class PagesController extends Controller
 {
@@ -49,16 +51,27 @@ class PagesController extends Controller
 
     // Show products page
     public function productsPage(Request $request)
-    {
-        // Ensure a customer is selected
-        if (!$request->session()->has('selected_customer')) {
-            return redirect()->route('select.customer')->withErrors(['error' => 'Please select a customer first.']);
-        }
-
-        $selectedCustomer = $request->session()->get('selected_customer');
-
-        return view('front.products', compact('selectedCustomer'));
+{
+    // Ensure a customer is selected
+    if (!$request->session()->has('selected_customer')) {
+        return redirect()->route('select.customer')->withErrors(['error' => 'Please select a customer first.']);
     }
+
+    $selectedCustomer = $request->session()->get('selected_customer');
+
+    // Fetch all categories
+    $categories = Category::all();
+
+    // Fetch products based on selected category or all products if none selected
+    $selectedCategoryId = $request->query('category_id');
+    if ($selectedCategoryId) {
+        $products = Product::where('category_id', $selectedCategoryId)->get();
+    } else {
+        $products = Product::all();
+    }
+
+    return view('front.products', compact('selectedCustomer', 'categories', 'products', 'selectedCategoryId'));
+}
 
 
     public function resetCustomer(Request $request)

@@ -12,15 +12,13 @@
             <li>
                 <button data-category="all" class="category-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700">All Products</button>
             </li>
-            <li>
-                <button data-category="electronics" class="category-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700">Electronics</button>
-            </li>
-            <li>
-                <button data-category="clothing" class="category-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700">Clothing</button>
-            </li>
-            <li>
-                <button data-category="books" class="category-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700">Books</button>
-            </li>
+            @foreach ($categories as $category)
+                <li>
+                    <button data-category="{{ $category->id }}" class="category-btn w-full text-left px-4 py-2 rounded hover:bg-gray-700">
+                        {{ $category->name }}
+                    </button>
+                </li>
+            @endforeach
         </ul>
     </aside>
 
@@ -34,36 +32,38 @@
 </div>
 
 <script>
-    const products = [
-        { id: 1, name: 'Laptop', description: 'A powerful laptop.', image: 'https://via.placeholder.com/150', category: 'electronics' },
-        { id: 2, name: 'Smartphone', description: 'A cutting-edge smartphone.', image: 'https://via.placeholder.com/150', category: 'electronics' },
-        { id: 3, name: 'T-Shirt', description: 'A comfortable T-Shirt.', image: 'https://via.placeholder.com/150', category: 'clothing' },
-        { id: 4, name: 'Jeans', description: 'Stylish jeans.', image: 'https://via.placeholder.com/150', category: 'clothing' },
-        { id: 5, name: 'Novel', description: 'A captivating novel.', image: 'https://via.placeholder.com/150', category: 'books' },
-        { id: 6, name: 'Biography', description: 'An inspiring biography.', image: 'https://via.placeholder.com/150', category: 'books' },
-    ];
+    // Embed products and categories in JavaScript
+    const products = @json($products);
 
     function displayProducts(category = 'all') {
         const productContainer = document.getElementById('products');
         productContainer.innerHTML = '';
 
+        // Filter products by category
         const filteredProducts = category === 'all'
             ? products
-            : products.filter(product => product.category === category);
+            : products.filter(product => product.category_id == category);
 
+        // Display filtered products
         filteredProducts.forEach(product => {
             const productElement = document.createElement('div');
             productElement.className = 'p-4 border rounded bg-white shadow';
             productElement.innerHTML = `
-                <img src="${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-4">
+                <img src="/storage/${product.image}" alt="${product.name}" class="w-full h-32 object-cover rounded mb-4">
                 <h3 class="text-lg font-bold mb-2">${product.name}</h3>
                 <p class="text-gray-600 mb-4">${product.description}</p>
                 <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add to Cart</button>
             `;
             productContainer.appendChild(productElement);
         });
+
+        // Handle case when no products are found
+        if (filteredProducts.length === 0) {
+            productContainer.innerHTML = '<p class="text-gray-600">No products available for this category.</p>';
+        }
     }
 
+    // Event Listeners for Category Buttons
     document.querySelectorAll('.category-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const category = e.target.getAttribute('data-category');
@@ -71,6 +71,7 @@
         });
     });
 
+    // Display all products on page load
     displayProducts();
 </script>
 @endsection
