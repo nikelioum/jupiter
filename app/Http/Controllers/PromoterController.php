@@ -33,7 +33,7 @@ class PromoterController extends Controller
 
 
             // Redirect to the dashboard with success message
-            return redirect()->route('promoter.dashboard')->with('success', 'You are logged in!');
+            return redirect()->route('select.customer')->with('success', 'You are logged in!');
         }
 
         // Authentication failed

@@ -19,5 +19,9 @@ Route::post('/promoter-logout', [PromoterController::class, 'promoterLogout'])->
 
 // Protected Routes for Promoters
 Route::middleware(PromoterMiddleware::class)->group(function () {
-    Route::get('/promoter-dashboard', [PagesController::class, 'promoter_dashboard'])->name('promoter.dashboard');
+    // Route::get('/promoter-dashboard', [PagesController::class, 'promoter_dashboard'])->name('promoter.dashboard');
+    Route::get('/select-customer', [PagesController::class, 'selectCustomerPage'])->name('select.customer');
+    Route::post('/set-customer', [PagesController::class, 'setCustomer'])->name('set.customer');
+    Route::get('/products', [PagesController::class, 'productsPage'])->name('products');
+    Route::post('/reset-customer', [PagesController::class, 'resetCustomer'])->name('reset.customer');
 });
